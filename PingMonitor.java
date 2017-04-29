@@ -4,12 +4,36 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-public class PingMonitor {
+public class PingMonitor{
+  	public static void main(String[] args) {
+		PingWindow window = new PingWindow("Ping Monitor"); 
+		window.setVisible(true);
+		window.setSize(400,400);
+	}
+}
 
-  public static int runSystemCommand(String command) {
+class PingFetcher implements Runnable{
+	private int ping;
+	private Thread t;
+	private String site;
 
+	public int getPing(String site) {
+		this.site = site;
+		t = new Thread(this, "PingFetcher Thread");
+		t.start();
 		try {
-			Process p = Runtime.getRuntime().exec(command);
+			Thread.sleep(1000);
+		}
+		catch (InterruptedException e) {
+			System.out.println("Thread Interrupted");
+		}
+		t.stop();					//stop searching for ping if time exceeds 1000ms for system
+		return ping;
+	}
+
+	public void run() {
+		try {
+			Process p = Runtime.getRuntime().exec("ping " + site);
 			BufferedReader inputStream = new BufferedReader(
 					new InputStreamReader(p.getInputStream()));
 
@@ -17,38 +41,33 @@ public class PingMonitor {
 			// reading output stream of the command
 			while ((s = inputStream.readLine()) != null) {
 				if(s.indexOf("could not find host")!=-1){
-					return -1;
+					ping = -1;
 				}
 				int start = s.indexOf("time=");
 				if(start!=-1){
 					int end = s.indexOf("ms");
 					s = s.substring(start+5,end);
-					return Integer.parseInt(s);
+					ping = Integer.parseInt(s);
 				}
 			}
 
 		}
-		
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		return -1;
-	}
-
-	public static void main(String[] args) {
-		FrameGenerator window = new FrameGenerator("Ping Monitor"); 
-		window.setVisible(true);
-		window.setSize(400,400);
 	}
 }
 
-class FrameGenerator extends Frame{
+class PingWindow extends Frame{
 	private int count = RanGen.generate();
 	private int averagePing;
 	private int pingData[];
 	private int high=200, mid=100, low=0;
-	public FrameGenerator(String title){
+	private PingFetcher pinger;
+	public PingWindow(String title){
 		super(title);
+
+		pinger = new PingFetcher();
 
 		pingData = new int[20];
 
@@ -71,7 +90,7 @@ class FrameGenerator extends Frame{
 
 	public void paint(Graphics g){
 		String ip = "google.com";
-		int ping = PingMonitor.runSystemCommand("ping " + ip+" -t");
+		int ping = pinger.getPing("google.com");
 
 		g.fillRect(40,55,342,205);
 		int oldLineX = 40, oldLineY;
@@ -115,13 +134,14 @@ class FrameGenerator extends Frame{
 		else if(loss<=20){
 			g.setColor(Color.yellow);	
 		}
-		else if(loss<=30){
+		else if(loss<30){
 			g.setColor(Color.orange);	
 		}
 		else{
 			g.setColor(Color.red);	
 		}
 		g.fillRect(280,300,30,30);
+		
 	}
 
 	public int getAveragePing(){
