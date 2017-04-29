@@ -73,7 +73,7 @@ class FrameGenerator extends Frame{
 		String ip = "google.com";
 		int ping = PingMonitor.runSystemCommand("ping " + ip+" -t");
 
-		g.fillRect(40,55,342,200);
+		g.fillRect(40,55,342,205);
 		int oldLineX = 40, oldLineY;
 		if(pingData[0]==-1){
 			oldLineY = 60;
@@ -97,13 +97,15 @@ class FrameGenerator extends Frame{
 		g.setColor(Color.black);
 		g.setFont(new Font("Arial",Font.PLAIN,10));
 		g.drawString(Integer.toString(high),20,70);
-		g.drawString(Integer.toString(mid),20,160);
-		g.drawString(Integer.toString(low),20,250);
+		g.drawString(Integer.toString(mid),20,165);
+		g.drawString(Integer.toString(low),30,255);
 
 
 		//Ping : 20 | Average Ping : 23
 		g.setFont(new Font("Arial",Font.PLAIN,15));
-		g.drawString("Ping : "+count+"  |  "+"Average Ping : "+getAveragePing(),20,370);	
+		g.drawString("Ping : "+count+"ms",20,290);
+		g.drawString("Average Ping : "+getAveragePing()+"ms",20,320);
+		g.drawString("Loss Percentage : "+getLossPercentage()+"%",20,350);	
 	}
 
 	public int getAveragePing(){
@@ -116,10 +118,23 @@ class FrameGenerator extends Frame{
 			}
 			totalPing += pingData[i];
 		}
-		if(noOfPing == 0){
-			return -1;
-		}
 		return totalPing/noOfPing;
+	}
+
+	public int getLossPercentage(){
+		int totalPing = 20;
+		int lossPing = 0;
+		for(int i = 0; i < 20; i++){
+			if(pingData[i] == -2){
+				totalPing--;
+				continue;
+			}
+			if(pingData[i] == -1){
+				lossPing++;
+				continue;
+			}
+		}
+		return lossPing*100/totalPing;
 	}
 
 	class MyTimerTask extends TimerTask {
