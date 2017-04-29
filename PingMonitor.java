@@ -102,10 +102,26 @@ class FrameGenerator extends Frame{
 
 
 		//Ping : 20 | Average Ping : 23
+		int loss = getLossPercentage();
 		g.setFont(new Font("Arial",Font.PLAIN,15));
 		g.drawString("Ping : "+count+"ms",20,290);
 		g.drawString("Average Ping : "+getAveragePing()+"ms",20,320);
-		g.drawString("Loss Percentage : "+getLossPercentage()+"%",20,350);	
+		g.drawString("Loss Percentage : "+loss+"%",20,350);
+
+		g.drawString("NetHealth",265,290);
+		if(loss<=5){
+			g.setColor(Color.green);	
+		}
+		else if(loss<=20){
+			g.setColor(Color.yellow);	
+		}
+		else if(loss<=30){
+			g.setColor(Color.orange);	
+		}
+		else{
+			g.setColor(Color.red);	
+		}
+		g.fillRect(280,300,30,30);
 	}
 
 	public int getAveragePing(){
@@ -155,7 +171,7 @@ class FrameGenerator extends Frame{
 class RanGen{
 	public static int generate(){
 		Random rn = new Random();
-		if(rn.nextInt(5)<2){
+		if(rn.nextInt(10)<2){
 			return -1;
 		}
 		return rn.nextInt(200)-1;
