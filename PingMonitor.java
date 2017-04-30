@@ -40,7 +40,7 @@ class PingFetcher implements Runnable{
 			String s = "";
 			// reading output stream of the command
 			while ((s = inputStream.readLine()) != null) {
-				if(s.indexOf("could not find host")!=-1){
+				if(s.indexOf("could not find host")!=-1 || s.indexOf("timed out")!=-1){
 					ping = -1;
 				}
 				int start = s.indexOf("time=");
