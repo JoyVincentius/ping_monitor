@@ -27,7 +27,7 @@ class PingFetcher implements Runnable{
 		catch (InterruptedException e) {
 			System.out.println("Thread Interrupted");
 		}
-		t.stop();					//stop searching for ping if time exceeds 1000ms for system
+		// t.stop();					//stop searching for ping if time exceeds 1000ms for system
 		return ping;
 	}
 
@@ -59,7 +59,7 @@ class PingFetcher implements Runnable{
 }
 
 class PingWindow extends Frame{
-	private int count = RanGen.generate();
+	private int ping;
 	private int averagePing;
 	private int pingData[];
 	private int high=200, mid=100, low=0;
@@ -71,10 +71,10 @@ class PingWindow extends Frame{
 
 		pingData = new int[20];
 
-		for(int i = 1; i < 20; i++){
+		for(int i = 0; i < 20; i++){
 			pingData[i] = -2;
 		}
-		pingData[0] = 0;
+		// pingData[0] = 0;
 
 		MyTimerTask myTask = new MyTimerTask();
 		Timer myTimer = new Timer();
@@ -89,8 +89,7 @@ class PingWindow extends Frame{
 	}
 
 	public void paint(Graphics g){
-		String ip = "google.com";
-		int ping = pinger.getPing("google.com");
+	
 
 		g.fillRect(40,55,342,205);
 		int oldLineX = 40, oldLineY;
@@ -123,7 +122,7 @@ class PingWindow extends Frame{
 		//Ping : 20 | Average Ping : 23
 		int loss = getLossPercentage();
 		g.setFont(new Font("Arial",Font.PLAIN,15));
-		g.drawString("Ping : "+count+"ms",20,290);
+		g.drawString("Ping : "+ping+"ms",20,290);
 		g.drawString("Average Ping : "+getAveragePing()+"ms",20,320);
 		g.drawString("Loss Percentage : "+loss+"%",20,350);
 
@@ -141,6 +140,7 @@ class PingWindow extends Frame{
 			g.setColor(Color.red);	
 		}
 		g.fillRect(280,300,30,30);
+
 		
 	}
 
@@ -153,6 +153,9 @@ class PingWindow extends Frame{
 				continue;
 			}
 			totalPing += pingData[i];
+		}
+		if(noOfPing==0){
+			return -1;
 		}
 		return totalPing/noOfPing;
 	}
@@ -170,30 +173,22 @@ class PingWindow extends Frame{
 				continue;
 			}
 		}
+		if(totalPing==0){
+			return -1;
+		}
 		return lossPing*100/totalPing;
 	}
 
 	class MyTimerTask extends TimerTask {
 		public void run() {
+			ping = pinger.getPing("google.com");
 			for(int i = 19; i > 0; i--){
 				pingData[i] = pingData[i-1];
 			}
-			pingData[0] = count;
+			pingData[0] = ping;
 			
 			repaint();
-			count = RanGen.generate();
 		}	
 	}
 
-}
-
-
-class RanGen{
-	public static int generate(){
-		Random rn = new Random();
-		if(rn.nextInt(10)<2){
-			return -1;
-		}
-		return rn.nextInt(200)-1;
-	}
 }
