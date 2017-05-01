@@ -33,7 +33,7 @@ class PingFetcher implements Runnable{
 
 	public void run() {
 		try {
-			Process p = Runtime.getRuntime().exec("ping " + site);
+			Process p = Runtime.getRuntime().exec("ping " + site + " -n 1");
 			BufferedReader inputStream = new BufferedReader(
 					new InputStreamReader(p.getInputStream()));
 
